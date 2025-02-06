@@ -1,0 +1,168 @@
+	
+select * from results;
+drop table results;
+drop table results;
+
+
+
+
+show tables;
+ 
+ 
+show tables;
+drop table academic_year;
+drop table sem_table ;
+drop table sub_table;
+drop table year_sem ;
+drop table year_table ;  
+
+
+
+ select * from sub_table;
+ CREATE TABLE AcademicYear (
+    academic_id INT PRIMARY KEY ,
+    year YEAR NOT NULL,
+    branch VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE academicyear (
+    academic_id int PRIMARY KEY,         -- Unique ID for each academic year
+    academic_year VARCHAR(15) NOT NULL   -- Academic year range in "YYYY-YYYY" format
+);
+
+
+
+drop table AcademicYear;
+select * from academicyear;
+DESC AcademicYear;
+ALTER TABLE AcademicYear MODIFY COLUMN academic_id VARCHAR(20) PRIMARY KEY;
+
+
+CREATE TABLE sub_table (
+    sub_code VARCHAR(20) PRIMARY KEY,
+    sub_name VARCHAR(255) NOT NULL,
+    credits FLOAT NOT NULL
+);
+
+CREATE TABLE academicyear (
+    academic_id int PRIMARY KEY,         -- Unique ID for each academic year
+    academic_year VARCHAR(15) NOT NULL   -- Academic year range in "YYYY-YYYY" format
+);
+
+CREATE TABLE year_table (
+    academic_id INT NOT NULL,          -- Represents the batch ID (e.g., 16, 17, 18)
+    year INT NOT NULL,                 -- The specific year (e.g., 2016, 2017, etc.)
+    branch VARCHAR(10) NOT NULL,       -- The branch (e.g., CSE, ECE, EEE, CSM, MECH)
+    year_code VARCHAR(15) NOT NULL,    -- Year code (e.g., 161CSE, 172EEE, 183MECH)
+    PRIMARY KEY (year_code),           -- Making year_code the primary key
+    FOREIGN KEY (academic_id) REFERENCES AcademicYear(academic_id) ON DELETE CASCADE -- To link with AcademicYear table
+);
+
+CREATE TABLE student_table (
+    student_regno VARCHAR(20) NOT NULL PRIMARY KEY, -- Registration number as primary key
+    academic_id INT NOT NULL,                       -- Foreign key from AcademicYear table
+    branch VARCHAR(10) NOT NULL,                   -- Branch name
+    FOREIGN KEY (academic_id) REFERENCES AcademicYear(academic_id)
+        ON DELETE CASCADE                           -- Cascade deletes to handle academic year deletions
+        ON UPDATE CASCADE                           -- Cascade updates to maintain referential integrity
+);
+
+
+drop  table year_sem;
+
+CREATE TABLE year_sem (
+    year_code varchar(15),
+    sem_id INT,
+    PRIMARY KEY (year_code, sem_id),
+    FOREIGN KEY (year_code) REFERENCES year_table(year_code) ON DELETE CASCADE,
+    FOREIGN KEY (sem_id) REFERENCES sem_table(sem_id) ON DELETE CASCADE
+);
+
+CREATE TABLE sem_table (
+    sem_id INT PRIMARY KEY,
+    sem VARCHAR(10) NOT NULL
+);
+
+CREATE TABLE semsub_table (
+    sem_id INT,
+    sub_code VARCHAR(10),
+    PRIMARY KEY (sem_id, sub_code),
+    FOREIGN KEY (sem_id) REFERENCES sem_table(sem_id),
+    FOREIGN KEY (sub_code) REFERENCES sub_table(sub_code)
+);
+
+CREATE TABLE sub_table (
+    sub_code VARCHAR(20) PRIMARY KEY,
+    sub_name VARCHAR(255) NOT NULL,
+    credits FLOAT NOT NULL
+);
+
+
+CREATE TABLE result_table (
+    result_id INT AUTO_INCREMENT PRIMARY KEY, -- Primary key with auto-increment
+    student_regno VARCHAR(20),               -- Foreign key from student_table
+    sub_code VARCHAR(20),                    -- Foreign key from sub_table
+    result_grade VARCHAR(10) NOT NULL,       -- Result grade
+    internals INT NOT NULL,                  -- Internals marks
+    FOREIGN KEY (student_regno) REFERENCES student_table(student_regno)
+        ON DELETE CASCADE                    -- Cascade delete when the student is deleted
+        ON UPDATE CASCADE,                   -- Cascade update for referential integrity
+    FOREIGN KEY (sub_code) REFERENCES sub_table(sub_code)
+        ON DELETE CASCADE                    -- Cascade delete when the subject is deleted
+        ON UPDATE CASCADE                    -- Cascade update for referential integrity
+);
+
+
+INSERT INTO sem_table (sem_id, sem) VALUES
+(11, '1-1'),
+(12, '1-2'),
+(21, '2-1'),
+(22, '2-2'),
+(31, '3-1'),
+(32, '3-2'),
+(41, '4-1'),
+(42, '4-2');
+
+select * from sem_table;
+select * from sub_table;
+select * from academicyear;
+select * from year_sem;
+select * from year_table;
+select * from student_table;  
+select * from result_table ;
+select * from semsub_table;
+
+
+select * from results;
+drop table results;
+ALTER TABLE results MODIFY grade VARCHAR(50);
+
+
+SELECT DISTINCT st.student_regno, rt.sub_code, rt.result_grade, rt.internals
+FROM student_table st
+INNER JOIN result_table rt
+ON st.student_regno = rt.student_regno
+WHERE st.student_regno = '226M1A0527';
+
+SELECT DISTINCT st.student_regno, st.academic_id, st.branch, 
+                  rt.sub_code, s.sub_name, rt.result_grade, rt.internals
+FROM student_table st
+INNER JOIN result_table rt
+ON st.student_regno = rt.student_regno
+INNER JOIN sub_table s
+ON rt.sub_code = s.sub_code
+WHERE st.student_regno = '226M1A0527';
+
+
+
+
+drop table result_table;
+drop table year_table;
+drop table academicyear;
+drop table student_table;
+drop table semsub_table; 
+drop table year_sem;
+drop table sem_table;
+drop table sub_table;
+drop table results;
+show tables;
