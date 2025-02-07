@@ -34,7 +34,7 @@ def index():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'pdf' not in request.files:
-        return "❌ No file uploaded", 400
+        return "❌ No file uploaded", 400 
 
     file = request.files['pdf']
     if file.filename == '':
@@ -115,20 +115,20 @@ def process_pdf(pdf_path):
                             ON DUPLICATE KEY UPDATE year = VALUES(year), branch = VALUES(branch), year_code = VALUES(year_code)
                         """, (academic_id, year_entry, branch, year_code))
 
-                    if grade not in ("F", "ABSENT"):
-                        cursor.execute("""
-                            INSERT INTO sub_table (sub_code, sub_name, credits)
-                            VALUES (%s, %s, %s)
-                            ON DUPLICATE KEY UPDATE sub_name = VALUES(sub_name), credits = VALUES(credits)
-                        """, (subcode, subname, credits))
+                   
+                    cursor.execute("""
+                            INSERT INTO sub_table (sub_code, sub_name)
+                            VALUES (%s, %s)
+                            ON DUPLICATE KEY UPDATE sub_name = VALUES(sub_name)
+                    """, (subcode, subname))
 
-                        cursor.execute("SELECT sub_code FROM sub_table WHERE sub_code = %s", (subcode,))
-                        if cursor.fetchone():
-                            cursor.execute("""
+                    cursor.execute("SELECT sub_code FROM sub_table WHERE sub_code = %s", (subcode,))
+                    if cursor.fetchone():
+                        cursor.execute("""
                                 INSERT INTO semsub_table (sem_id, sub_code)
                                 VALUES (%s, %s)
                                 ON DUPLICATE KEY UPDATE sub_code = VALUES(sub_code)
-                            """, (subcode[3:5], subcode))
+                        """, (subcode[3:5], subcode))
 
                     cursor.execute("""
                         INSERT INTO student_table (student_regno, academic_id, branch)
